@@ -40,15 +40,21 @@ namespace cs_toolkit
             // Create a buffer of 32 bytes of data to be transmitted.
             string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
             byte[] buffer = Encoding.ASCII.GetBytes(data);
-            int timeout = 120;
+            int timeout = 10000; // 10 seconds timeout
             PingReply reply = pingSender.Send(ipOrHost, timeout, buffer, options);
 
             return reply;
         }
         private void Submittion_Click(object sender, RoutedEventArgs e)
         {
+            ReportOutput.Text = "";
             PingReply data = PingIpOrHost(ip_address.Text);
-            ReportOutput.Text = $"Round trip time: {data.RoundtripTime}\nTime to live: {data.Options.Ttl}\nBuffer size {data.Buffer.Length}";
+            network_status.Content = data.Status.ToString();
+            if (data.Status == IPStatus.Success)
+            {
+                ReportOutput.Text = $"Round trip time: {data.RoundtripTime}\nTime to live: {data.Options.Ttl}\nBuffer size {data.Buffer.Length}";
+
+            }
         }
     }
 }

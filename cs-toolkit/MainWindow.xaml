@@ -6,10 +6,23 @@
         xmlns:local="clr-namespace:cs_toolkit"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <TextBox HorizontalAlignment="Left" Margin="24,26,0,0" Name="ip_address" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Ping" HorizontalAlignment="Left" Margin="163,24,0,0" VerticalAlignment="Top" Click="Submittion_Click"/>
-        <TextBlock Name="ReportOutput" HorizontalAlignment="Left" Margin="24,63,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="83" Width="248"/>
-
+    <Grid Height="400" Width="750">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="250" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+            <TextBox HorizontalAlignment="Left" Name="ip_address" TextWrapping="Wrap" Text="192.168.0.1" VerticalAlignment="Top" Width="120"/>
+            <Button Content="Ping" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Submittion_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0">
+            <Label Content="" x:Name="network_status"/>
+            <TextBlock x:Name="ReportOutput" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="75" Width="220"/>
+        </StackPanel>
     </Grid>
 </Window>
