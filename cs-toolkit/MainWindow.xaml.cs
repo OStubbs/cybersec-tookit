@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.NetworkInformation;
+using System.Threading;
+using System.Windows.Markup;
+using System.Net;
 
 namespace cs_toolkit
 {
@@ -26,34 +29,49 @@ namespace cs_toolkit
             InitializeComponent();
         }
 
-        public static PingReply PingIpOrHost(string ipOrHost)
+        private void PingCompletedCallback(object sender, PingCompletedEventArgs e)
         {
-            // Stuck with default documentation code
+            if (e.Error != null)
+            {
+                //e.Error.ToString()
 
-            Ping pingSender = new Ping();
-            PingOptions options = new PingOptions();
+                // Let the main thread resume. 
+                ((AutoResetEvent)e.UserState).Set();
+            }
 
-            // Use the default Ttl value which is 128,
-            // but change the fragmentation behavior.
-            options.DontFragment = true;
+            Update_Report(e.Reply, "ping");
 
-            // Create a buffer of 32 bytes of data to be transmitted.
-            string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            byte[] buffer = Encoding.ASCII.GetBytes(data);
-            int timeout = 10000; // 10 seconds timeout
-            PingReply reply = pingSender.Send(ipOrHost, timeout, buffer, options);
-
-            return reply;
+            // Let the main thread resume.
+            ((AutoResetEvent)e.UserState).Set();
         }
+
         private void Submittion_Click(object sender, RoutedEventArgs e)
         {
             ReportOutput.Text = "";
-            PingReply data = PingIpOrHost(ip_address.Text);
-            network_status.Content = data.Status.ToString();
-            if (data.Status == IPStatus.Success)
-            {
-                ReportOutput.Text = $"Round trip time: {data.RoundtripTime}\nTime to live: {data.Options.Ttl}\nBuffer size {data.Buffer.Length}";
+            //PingIpOrHost(ip_address.Text);
+            AutoResetEvent waiter = new AutoResetEvent(false);
+            IPAddress ip = IPAddress.Parse(ip_address.Text);
+            var pingSender = new Ping();
 
+            pingSender.PingCompleted += PingCompletedCallback;
+            pingSender.SendAsync(ip, 1000, waiter);
+        }
+        
+        private void Update_Report(object o, string expected)
+        {
+            switch (expected)
+            {
+                case "ping":
+                    PingReply data = (PingReply)o;
+                    network_status.Content = data.Status.ToString();
+                    if (data.Status == IPStatus.Success)
+                    {
+                        ReportOutput.Text = $"Round trip time: {data.RoundtripTime}\nTime to live: {data.Options.Ttl}\nBuffer size {data.Buffer.Length}";
+
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
